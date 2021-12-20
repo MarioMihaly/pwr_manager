@@ -9,27 +9,15 @@
     -> allow duplicates
 '''
 
-import json
-import pyperclip
-from input_handler import *
 from commands import *
 from constants import *
+from config import init_data
 
-
-'''
-    Global variables
-'''
-public_key = None
-private_key_enc = None
-arguments = None
 
 def command_handler(command, arguments):
     '''
-    
+        Function to handle calls to available commands.
     '''
-    #global arguments
-    
-
     if command == EXIT:
         exit()
 
@@ -48,31 +36,25 @@ def command_handler(command, arguments):
     elif command == REMOVE:
         remove(arguments)
 
+    elif command == HELP:
+        help()
+
     else:
         print('Invalid command')
     
-
-def init_data():
-    global public_key, private_key_enc
-
-    # Initialise keys
-    with open(keys_path, 'r') as f:
-        keys = json.load(f)['keys']
-        public_key = keys['public']
-        private_key_enc = keys['private']
-
-    print(f'Public key: {public_key}\nPrivate key: {private_key_enc}')
-    #pyperclip.copy(public_key)
-    #print('Public key coppied to clipboard.')
-    
 def main():
-    init_data()
+    try:
+        init_data()
 
-    while True:
-        input_str = input(PROMPT)
-        command, arguments = input_str.split(' ', 1) if ' ' in input_str else (input_str, None)
+        while True:
+            input_str = input(PROMPT)
+            command, arguments = input_str.split(' ', 1) if ' ' in input_str else (input_str, None)
 
-        command_handler(command, arguments)
+            command_handler(command, arguments)
+
+    except KeyboardInterrupt:
+        print('Program interrupted, saving data and exiting.')
+        exit()
 
 if __name__ == '__main__':
     main()

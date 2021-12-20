@@ -8,6 +8,7 @@ UPDATE = 'update'
 UPADATE_KEY = 'update_key'
 RESET = 'reset'
 REMOVE = 'remove'
+HELP = 'help'
 
 #COMMAND_SELECTION = {
 #    EXIT: lambda: exit,
@@ -19,4 +20,5 @@ REMOVE = 'remove'
     Data paths
 '''
 keys_path = './data/keys.json'
-data_path = '.data/data.json'
+data_path = './data/data.json'
+help_path = './data/help.txt'

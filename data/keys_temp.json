@@ -1,6 +1,6 @@
 {
     "keys": {
-        "private": "",
-        "public": ""
+        "private": "master key",
+        "public": "public key"
     }
 }

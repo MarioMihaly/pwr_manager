@@ -1,0 +1,7 @@
+Commands available:
+    exit
+    new
+    update <site name>
+    update_key
+    reset
+    remove <site name>
