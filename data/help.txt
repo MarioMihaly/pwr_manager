@@ -5,3 +5,6 @@ Commands available:
     update_key
     reset
     remove <site name>
+    get_user <site name>
+    get_password <site name>
+    list

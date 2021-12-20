@@ -33,8 +33,11 @@ def command_handler(command, arguments):
     elif command == GET_PASSWORD:
         get_password(arguments)
 
+    elif command == GET_USER_NAME:
+        get_user_name(arguments)
+
     elif command == UPADATE_KEY:
-        update_key()
+        update_master_key()
 
     elif command == RESET:
         reset()

@@ -142,6 +142,29 @@ def update_user_name(site_name):
     else:
         print(f'User name update for {site_name} cancelled.')
 
+def get_user_name(site_name):
+    
+    # site name must be passed for command
+    if site_name in {None, ''}:
+        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        return
+
+    # check if entry exist
+    if site_name not in config.data:
+        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+        if choice == True:
+            new_password(site_name)
+        return
+
+    confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to retrieve user name for {site_name}: ')
+
+    if confirmed:
+        user_name = config.data[site_name]['user_name']
+        print(f'User name for {site_name} is: {user_name}')
+
+    else:
+        print(f'User name retrival for {site_name} cancelled.')
+
 def update_master_key():
     confirmed = input_handler.enter_master_key('Enter current master key to allow update to the master key: ')
     if confirmed:
