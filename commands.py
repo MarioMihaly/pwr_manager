@@ -1,6 +1,6 @@
 import json
 from constants import *
-from input_handler import yes_or_no
+from input_handler import yes_or_no, enter_master_key
 import config
 import sys
 
@@ -24,15 +24,18 @@ def exit():
     # Exit application
     sys.exit()
 
-def new_password():
-    # check if site_name and user_name combo already in database
-    # prompt for possibility to update
+def new_password(site_name):
 
-
-    site_name = input(PROMPT + 'Enter site: ')
+    # site name must be passed for command
+    if site_name in {None, ''}:
+        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        return
 
     # check if there is entry for site_name
-    # ask if want to update or continue adding a new one
+    if site_name in config.data:
+        choice = yes_or_no(f'{site_name} already in keychain. Do you want to replace it? [Y, N] ')
+        if choice == False:
+             return
 
     user_name = input(PROMPT + 'Enter user name: ')
     password = input(PROMPT + 'Enter password: ')
@@ -43,14 +46,17 @@ def new_password():
         password = input(PROMPT + 'Enter password: ')
         password_conf = input(PROMPT + 'Confirm password: ')
 
+    choice = enter_master_key(PROMPT + 'Enter master key to add new entry: ')
 
-    entry = {
-        'site_name' : site_name,
-        'user_name' : user_name,
-        'password' : password
-    }
-    config.data['entries'].append(entry)
-    
+    if choice == True:
+        config.data[site_name] = {
+                'user_name' : user_name,
+                'password' : password
+            }
+        print(f'New entry added for {site_name}')
+
+    else:
+        print(f'New entry cancelled for {site_name}')
     
 
 def update_password(arguments):
@@ -67,10 +73,7 @@ def update_key():
 def reset():
     choice = yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
     if choice == True:
-        with open(data_path, 'r+') as f:
-            data = json.load(f)
-            data['entries'] = []
-            print(data['entries'])
+        config.data = {}
         print('Keychain reset.')
     else:
         print('Keychain reset cancelled.')

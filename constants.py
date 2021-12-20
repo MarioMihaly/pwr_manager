@@ -9,6 +9,7 @@ UPADATE_KEY = 'update_key'
 RESET = 'reset'
 REMOVE = 'remove'
 HELP = 'help'
+CANCEL = 'cancel'
 
 #COMMAND_SELECTION = {
 #    EXIT: lambda: exit,

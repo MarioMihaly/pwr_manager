@@ -1,6 +1,6 @@
 Commands available:
     exit
-    new
+    new <site name>
     update <site name>
     update_key
     reset

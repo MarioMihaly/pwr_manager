@@ -18,11 +18,14 @@ def command_handler(command, arguments):
     '''
         Function to handle calls to available commands.
     '''
+    if arguments != None:
+        arguments = arguments.strip()
+
     if command == EXIT:
         exit()
 
     elif command == NEW:
-        new_password()
+        new_password(arguments)
 
     elif command == UPDATE:
         update_password(arguments)
