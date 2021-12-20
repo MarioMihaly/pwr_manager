@@ -43,4 +43,4 @@ def init_data():
     with open(data_path, 'r') as data_file:
         data = json.load(data_file)
 
-    print('Welcome to your password manager. Enter "help" to display available commands.')
+    print(f'Welcome to your password manager. Enter "{HELP}" to display available commands.')

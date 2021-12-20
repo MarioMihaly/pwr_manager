@@ -21,3 +21,26 @@ def enter_master_key(prompt_msg):
         return True
 
     return False
+
+def same_password(prompt_msg1 = 'Enter password: ', prompt_msg2 = 'Confirm password: '):
+    # TODO: handle case when wish to cancel
+
+    password = input(PROMPT + prompt_msg1)
+
+    # check for cancel flag
+    if password == CANCEL:
+        return password
+
+    password_conf = input(PROMPT + prompt_msg2)
+
+    while password != password_conf:
+        print(f'Passwords don\'t match! Enter "{CANCEL}" to stop process.')
+        password = input(PROMPT + prompt_msg1)
+
+        # check for cancel flag
+        if password == CANCEL:
+            return password
+
+        password_conf = input(PROMPT + prompt_msg2)
+
+    return password

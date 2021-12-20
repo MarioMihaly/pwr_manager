@@ -1,6 +1,6 @@
 import json
 from constants import *
-from input_handler import yes_or_no, enter_master_key
+import input_handler
 import config
 import sys
 
@@ -33,45 +33,67 @@ def new_password(site_name):
 
     # check if there is entry for site_name
     if site_name in config.data:
-        choice = yes_or_no(f'{site_name} already in keychain. Do you want to replace it? [Y, N] ')
-        if choice == False:
+        replace = input_handler.yes_or_no(f'{site_name} already in keychain. Do you want to replace it? [Y, N] ')
+        if replace == False:
              return
 
     user_name = input(PROMPT + 'Enter user name: ')
-    password = input(PROMPT + 'Enter password: ')
-    password_conf = input(PROMPT + 'Confirm password: ')
+    password = input_handler.same_password()
 
-    while password != password_conf:
-        print('Passwords don\'t match!')
-        password = input(PROMPT + 'Enter password: ')
-        password_conf = input(PROMPT + 'Confirm password: ')
+    if password == CANCEL:
+        print(f'New entry cancelled for {site_name}.')
+        return
 
-    choice = enter_master_key(PROMPT + 'Enter master key to add new entry: ')
+    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to add new entry: ')
 
-    if choice == True:
+    if confirmed:
         config.data[site_name] = {
                 'user_name' : user_name,
                 'password' : password
             }
-        print(f'New entry added for {site_name}')
+        print(f'New entry added for {site_name}.')
 
     else:
-        print(f'New entry cancelled for {site_name}')
+        print(f'New entry cancelled for {site_name}.')
     
-
-def update_password(arguments):
-    # check if entry exist
+def update_password(site_name):
+    # TODO
+    # check new password is not the same as old one -> define function for it
     # if multiple entries, prompt for email or
     # list all of them and select with up and down keys ?
 
-    site_name = arguments
-    print(f'Password updated for {site_name}')
+    # site name must be passed for command
+    if site_name in {None, ''}:
+        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        return
+
+    # check if entry exist
+    if site_name not in config.data:
+        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+        if choice == True:
+            new_password(site_name)
+        return
+
+    password = input_handler.same_password('Enter new password: ', 'Confirm new password: ')
+
+    if password == CANCEL:
+        print(f'Password update cancelled for {site_name}.')
+        return
+
+    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to confirm password update: ')
+
+    if confirmed:
+        config.data[site_name]['password'] = password
+        print(f'Password updated for {site_name}.')
+
+    else:
+        print(f'Password update for {site_name} cancelled.')
 
 def update_key():
     pass
 
 def reset():
-    choice = yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
+    choice = input_handler.yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
     if choice == True:
         config.data = {}
         print('Keychain reset.')
