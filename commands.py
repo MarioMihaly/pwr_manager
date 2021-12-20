@@ -185,11 +185,30 @@ def reset():
     else:
         print('Keychain reset cancelled.')
 
-def remove(arguments):
-    # check if there is an entry for a given site
-    # if there are multiple entries, prompt for email
-    site_name = arguments
-    print(f'Entry for {site_name} removed')
+def remove(site_name):
+    # TODO
+    # if there are multiple entries, prompt for email or used arrows to select from list
+
+    # site name must be passed for command
+    if site_name in {None, ''}:
+        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        return
+
+    # check if entry exist
+    if site_name not in config.data:
+        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+        if choice == True:
+            new_password(site_name)
+        return
+
+    confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to remove entry for {site_name}: ')
+
+    if confirmed:
+        config.data.pop(site_name)
+        print(f'Entry for {site_name} removed.')
+
+    else:
+        print(f'Removal of entry for {site_name} cancelled.')
 
 def help():
     with open(help_path, 'r') as f:
