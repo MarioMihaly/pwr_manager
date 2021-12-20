@@ -22,6 +22,32 @@ def enter_master_key(prompt_msg):
 
     return False
 
+def enter_master_key3():
+    '''
+        Function to verify master key from initial + 3 attempts.
+    '''
+
+    # Prompt for master key, exit after 3 attemtps
+    attempt_max = 3
+    attempt_count = 0
+
+    master_key = input(PROMPT + 'Enter master key: ')
+    
+    if master_key != config.private_key_enc:
+        print(f'Invalid master key! {attempt_max - attempt_count} attempt(s) remaining.')
+        master_key = input(PROMPT + 'Enter master key: ')
+        attempt_count += 1
+
+        while attempt_count < attempt_max and master_key != config.private_key_enc:
+            print(f'Invalid master key! {attempt_max - attempt_count} attempt(s) remaining.')
+            master_key = input(PROMPT + 'Enter master key: ')
+            attempt_count += 1
+
+    if attempt_count > attempt_max:
+        return False
+
+    return True
+
 def same_password(prompt_msg1 = 'Enter password: ', prompt_msg2 = 'Confirm password: '):
     # TODO: handle case when wish to cancel
 
@@ -44,3 +70,4 @@ def same_password(prompt_msg1 = 'Enter password: ', prompt_msg2 = 'Confirm passw
         password_conf = input(PROMPT + prompt_msg2)
 
     return password
+

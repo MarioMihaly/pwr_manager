@@ -30,6 +30,9 @@ def command_handler(command, arguments):
     elif command == UPDATE:
         update_password(arguments)
 
+    elif command == GET_PASSWORD:
+        get_password(arguments)
+
     elif command == UPADATE_KEY:
         update_key()
 
@@ -41,6 +44,9 @@ def command_handler(command, arguments):
 
     elif command == HELP:
         help()
+
+    elif command == LIST:
+        list_entries()
 
     else:
         print('Invalid command')

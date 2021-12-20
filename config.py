@@ -1,4 +1,5 @@
 from constants import *
+import input_handler
 import json
 
 #Global variables
@@ -20,22 +21,9 @@ def init_data():
         private_key_enc = keys['keys']['private']
 
     # Prompt for master key, exit after 3 attemtps
-    attempt_max = 3
-    attempt_count = 0
-
-    master_key = input(PROMPT + 'Enter master key: ')
+    login_success = input_handler.enter_master_key3()
     
-    if master_key != private_key_enc:
-        print(f'Invalid master key! {attempt_max - attempt_count} attempt(s) remaining.')
-        master_key = input(PROMPT + 'Enter master key: ')
-        attempt_count += 1
-
-        while attempt_count < attempt_max and master_key != private_key_enc:
-            print(f'Invalid master key! {attempt_max - attempt_count} attempt(s) remaining.')
-            master_key = input(PROMPT + 'Enter master key: ')
-            attempt_count += 1
-
-    if attempt_count == attempt_max:
+    if login_success == False:
         print('Login failed!')
         exit()
 
