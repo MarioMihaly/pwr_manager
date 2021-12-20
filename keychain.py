@@ -1,34 +1,34 @@
-import sys
+'''
+    TODO
+    -> set up of master password
+    -> reading entries (read into Pandas.DataFrame)
+    -> look up function
+        -> list all entries, way for user to select
+        -> up and down arrows and enter for selection ?
+    -> update_email for entrys
+    -> allow duplicates
+'''
+
 import json
 import pyperclip
+from input_handler import *
+from commands import *
+from constants import *
 
-PROMPT = '> '
-'''
-    Commands
-'''
-EXIT = 'exit'
-NEW = 'new'
-UPDATE = 'update'
-UPADATE_KEY = 'update_key'
-RESET = 'reset'
-
-'''
-    Data paths
-'''
-keys_path = './data/keys.json'
-data_path = '.data/data.json'
 
 '''
     Global variables
 '''
 public_key = None
 private_key_enc = None
-
+arguments = None
 
 def command_handler(command, arguments):
     '''
     
     '''
+    #global arguments
+    
 
     if command == EXIT:
         exit()
@@ -45,48 +45,12 @@ def command_handler(command, arguments):
     elif command == RESET:
         reset()
 
+    elif command == REMOVE:
+        remove(arguments)
+
     else:
         print('Invalid command')
     
-
-
-def exit():
-    '''
-        Function to handle exit command.
-        -> save changes made to files
-        -> exit CLI
-    '''
-    sys.exit()
-
-def new_password():
-    site_name = input(PROMPT + 'Enter site: ')
-    user_name = input(PROMPT + 'Enter user name: ')
-    password = input(PROMPT + 'Enter password: ')
-    password_conf = input(PROMPT + 'Confirm password: ')
-
-    while password != password_conf:
-        print('Passwords don\'t match!')
-        password = input(PROMPT + 'Enter password: ')
-        password_conf = input(PROMPT + 'Confirm password: ')
-
-    print(f'Site: {site_name}\nUser name: {user_name}\nPassword:{password}')
-
-def update_password(arguments):
-    site_name = arguments
-    print(f'Password updated for site {site_name}')
-
-def update_key():
-    pass
-
-def reset():
-    a = input('Are you sure you want to reset keychain? [Y, N] ')
-    if a in ['y', 'Y']:
-        print('Keychain reset.')
-    elif a in ['n', 'N']:
-        print('Keychain reset cancelled.')
-    else:
-        print(f'Invalid choice {a}')
-        reset()
 
 def init_data():
     global public_key, private_key_enc
@@ -101,15 +65,12 @@ def init_data():
     #pyperclip.copy(public_key)
     #print('Public key coppied to clipboard.')
     
-
 def main():
     init_data()
 
     while True:
         input_str = input(PROMPT)
         command, arguments = input_str.split(' ', 1) if ' ' in input_str else (input_str, None)
-        #print(f'Command: {command}')
-        #print(f'Arguments: {arguments}')
 
         command_handler(command, arguments)
 
