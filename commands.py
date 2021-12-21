@@ -1,6 +1,14 @@
 # TODO
 # option to type cancel at any point to interrupt
 #   or handle interrupts to return to default state while handling command
+# split on update using secondary key
+#   new commands for update:
+#   -> update <site name> password
+#   -> update <site name> user
+#   -> udate master
+#   new commands for get
+#   -> get <site name> passowrd
+#   -> get <site name> user
 
 
 
@@ -30,7 +38,8 @@ def exit():
     # Exit application
     sys.exit()
 
-def new_password(site_name):
+def new_password():
+    site_name = config.arguments
 
     # site name must be passed for command
     if site_name in {None, ''}:
@@ -62,11 +71,13 @@ def new_password(site_name):
     else:
         print(f'New entry cancelled for {site_name}.')
     
-def update_password(site_name):
+def update_password():
     # TODO
     # check new password is not the same as old one -> define function for it
     # if multiple entries, prompt for email or
     # list all of them and select with up and down keys ?
+
+    site_name = config.arguments
 
     # site name must be passed for command
     if site_name in {None, ''}:
@@ -77,7 +88,7 @@ def update_password(site_name):
     if site_name not in config.data:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            new_password(site_name)
+            new_password()
         return
 
     password = input_handler.same_password('Enter new password: ', 'Confirm new password: ')
@@ -95,7 +106,8 @@ def update_password(site_name):
     else:
         print(f'Password update for {site_name} cancelled.')
 
-def get_password(site_name):
+def get_password():
+    site_name = config.arguments
 
     # site name must be passed for command
     if site_name in {None, ''}:
@@ -106,7 +118,7 @@ def get_password(site_name):
     if site_name not in config.data:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            new_password(site_name)
+            new_password()
         return
 
     confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to retrieve password for {site_name}: ')
@@ -118,7 +130,9 @@ def get_password(site_name):
     else:
         print(f'Password retrival for {site_name} cancelled.')
 
-def update_user_name(site_name):
+def update_user_name():
+    site_name = config.arguments
+
     # site name must be passed for command
     if site_name in {None, ''}:
         print(f'Invalid command. Type "{HELP}" to see command usage.')
@@ -128,7 +142,7 @@ def update_user_name(site_name):
     if site_name not in config.data:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            new_password(site_name)
+            new_password()
         return
 
     user_name = input(PROMPT + 'Enter new user name: ')
@@ -142,8 +156,9 @@ def update_user_name(site_name):
     else:
         print(f'User name update for {site_name} cancelled.')
 
-def get_user_name(site_name):
-    
+def get_user_name():
+    site_name = config.arguments
+
     # site name must be passed for command
     if site_name in {None, ''}:
         print(f'Invalid command. Type "{HELP}" to see command usage.')
@@ -153,7 +168,7 @@ def get_user_name(site_name):
     if site_name not in config.data:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            new_password(site_name)
+            new_password()
         return
 
     confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to retrieve user name for {site_name}: ')
@@ -185,9 +200,11 @@ def reset():
     else:
         print('Keychain reset cancelled.')
 
-def remove(site_name):
+def remove():
     # TODO
     # if there are multiple entries, prompt for email or used arrows to select from list
+
+    site_name = config.arguments
 
     # site name must be passed for command
     if site_name in {None, ''}:
@@ -198,7 +215,7 @@ def remove(site_name):
     if site_name not in config.data:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            new_password(site_name)
+            new_password()
         return
 
     confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to remove entry for {site_name}: ')

@@ -7,62 +7,47 @@
         -> up and down arrows and enter for selection ?
     -> update_email for entrys
     -> allow duplicates
+    -> add better command handler
+        -> dict -> map to functions
+        -> introduce global variables for command and arguments
 '''
 
 from commands import *
 from constants import *
-from config import init_data
+import config
+from input_handler import split_first
 
+COMMANDS = {
+    EXIT: lambda: exit(),
+    NEW: lambda: new_password(),
+    UPDATE: lambda: update_password(),
+    GET_PASSWORD: lambda: get_password(),
+    GET_USER_NAME: lambda: get_user_name(),
+    UPDATE_KEY: lambda: update_master_key(),
+    RESET: lambda: reset(),
+    REMOVE: lambda: remove(),
+    HELP: lambda: help(),
+    LIST: lambda: list_entries()
+}
 
-def command_handler(command, arguments):
+def command_handler(command):
     '''
         Function to handle calls to available commands.
     '''
-    if arguments != None:
-        arguments = arguments.strip()
+    if config.arguments != None:
+        config.arguments = config.arguments.strip()
 
-    if command == EXIT:
-        exit()
-
-    elif command == NEW:
-        new_password(arguments)
-
-    elif command == UPDATE:
-        update_password(arguments)
-
-    elif command == GET_PASSWORD:
-        get_password(arguments)
-
-    elif command == GET_USER_NAME:
-        get_user_name(arguments)
-
-    elif command == UPADATE_KEY:
-        update_master_key()
-
-    elif command == RESET:
-        reset()
-
-    elif command == REMOVE:
-        remove(arguments)
-
-    elif command == HELP:
-        help()
-
-    elif command == LIST:
-        list_entries()
-
-    else:
-        print('Invalid command')
+    COMMANDS.get(command, lambda: print('Invalid command.'))()
+    
     
 def main():
     try:
-        init_data()
+        config.init_data()
 
         while True:
-            input_str = input(PROMPT)
-            command, arguments = input_str.split(' ', 1) if ' ' in input_str else (input_str, None)
+            command, config.arguments = split_first(input(PROMPT))
 
-            command_handler(command, arguments)
+            command_handler(command)
 
     except KeyboardInterrupt:
         print('Program interrupted, saving data and exiting.')

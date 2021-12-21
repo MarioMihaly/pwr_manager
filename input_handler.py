@@ -71,3 +71,5 @@ def same_password(prompt_msg1 = 'Enter password: ', prompt_msg2 = 'Confirm passw
 
     return password
 
+def split_first(line, delimiter=' ', default_value = None):
+    return line.split(delimiter, 1) if delimiter in line else (line, default_value)
