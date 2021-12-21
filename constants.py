@@ -14,6 +14,10 @@ REMOVE = 'remove'
 HELP = 'help'
 LIST = 'list'
 
+MASTER = 'master'
+PASS = 'password'
+USER = 'user'
+
 ##################
  #    Flags
 ##################

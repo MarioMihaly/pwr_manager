@@ -20,10 +20,9 @@ from input_handler import split_first
 COMMANDS = {
     EXIT: lambda: exit(),
     NEW: lambda: new_password(),
-    UPDATE: lambda: update_password(),
+    UPDATE: lambda: update(),
     GET_PASSWORD: lambda: get_password(),
     GET_USER_NAME: lambda: get_user_name(),
-    UPDATE_KEY: lambda: update_master_key(),
     RESET: lambda: reset(),
     REMOVE: lambda: remove(),
     HELP: lambda: help(),

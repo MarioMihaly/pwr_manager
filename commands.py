@@ -18,6 +18,8 @@ import input_handler
 import config
 import sys
 
+INVALID_COMMAND_MSG = f'Invalid command. Type "{HELP}" to see command usage.'
+
 
 def exit():
     '''
@@ -70,26 +72,73 @@ def new_password():
 
     else:
         print(f'New entry cancelled for {site_name}.')
-    
-def update_password():
+
+def update():
     # TODO
     # check new password is not the same as old one -> define function for it
     # if multiple entries, prompt for email or
     # list all of them and select with up and down keys ?
 
-    site_name = config.arguments
 
-    # site name must be passed for command
-    if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
+    if config.arguments in {None, ''}:
+        print(INVALID_COMMAND_MSG)
         return
 
-    # check if entry exist
-    if site_name not in config.data:
-        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+    option, argument = input_handler.split_first(config.arguments)
+
+    if option in {None, ''}:
+        print(INVALID_COMMAND_MSG)
+        return
+
+    if option == MASTER:
+        update_master_key()
+        return
+    
+    elif option not in config.data and argument in {USER, PASS}:
+        choice = input_handler.yes_or_no(f'{option} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
+            config.arguments = option
             new_password()
         return
+
+    if argument == USER:
+        update_user_name(option)
+
+    elif argument == PASS:
+        update_password(option)
+    
+    else:
+        print(INVALID_COMMAND_MSG)
+
+def update_master_key():
+    confirmed = input_handler.enter_master_key('Enter current master key to allow update to the master key: ')
+    if confirmed:
+        new_master_key = input_handler.same_password('Enter new master key: ', 'Confirm new master key: ')
+
+        if new_master_key != CANCEL:
+            config.private_key_enc = new_master_key
+            print('New master key saved.')
+            return
+    
+    print('Update to the master key cancelled.')
+
+def update_user_name(site_name):
+    user_name = input(PROMPT + 'Enter new user name: ')
+
+    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to confirm user name update: ')
+
+    if confirmed:
+        config.data[site_name]['user_name'] = user_name
+        print(f'User name updated for {site_name}.')
+
+    else:
+        print(f'User name update for {site_name} cancelled.')
+
+def update_password(site_name):
+    # TODO
+    # check new password is not the same as old one -> define function for it
+    # if multiple entries, prompt for email or
+    # list all of them and select with up and down keys ?
 
     password = input_handler.same_password('Enter new password: ', 'Confirm new password: ')
 
@@ -130,32 +179,6 @@ def get_password():
     else:
         print(f'Password retrival for {site_name} cancelled.')
 
-def update_user_name():
-    site_name = config.arguments
-
-    # site name must be passed for command
-    if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
-        return
-
-    # check if entry exist
-    if site_name not in config.data:
-        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
-        if choice == True:
-            new_password()
-        return
-
-    user_name = input(PROMPT + 'Enter new user name: ')
-
-    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to confirm user name update: ')
-
-    if confirmed:
-        config.data[site_name]['user_name'] = user_name
-        print(f'User name updated for {site_name}.')
-
-    else:
-        print(f'User name update for {site_name} cancelled.')
-
 def get_user_name():
     site_name = config.arguments
 
@@ -179,18 +202,6 @@ def get_user_name():
 
     else:
         print(f'User name retrival for {site_name} cancelled.')
-
-def update_master_key():
-    confirmed = input_handler.enter_master_key('Enter current master key to allow update to the master key: ')
-    if confirmed:
-        new_master_key = input_handler.same_password('Enter new master key: ', 'Confirm new master key: ')
-
-        if new_master_key != CANCEL:
-            config.private_key_enc = new_master_key
-            print('New master key saved.')
-            return
-    
-    print('Update to the master key cancelled.')
 
 def reset():
     choice = input_handler.yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
