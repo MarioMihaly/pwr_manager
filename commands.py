@@ -73,6 +73,34 @@ def new_password():
     else:
         print(f'New entry cancelled for {site_name}.')
 
+def get():
+    if config.arguments in {None, ''}:
+        print(INVALID_COMMAND_MSG)
+        return
+
+    site_name, argument = input_handler.split_first(config.arguments)
+
+    if argument in {None, ''}:
+        print(INVALID_COMMAND_MSG)
+        return
+    
+    if site_name not in config.data and argument in {USER, PASS}:
+        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+        if choice == True:
+            config.arguments = site_name
+            new_password()
+        return
+
+    if argument == USER:
+        get_user_name(site_name)
+
+    elif argument == PASS:
+        get_password(site_name)
+    
+    else:
+        print(INVALID_COMMAND_MSG)
+
+
 def update():
     # TODO
     # check new password is not the same as old one -> define function for it
@@ -125,7 +153,7 @@ def update_master_key():
 def update_user_name(site_name):
     user_name = input(PROMPT + 'Enter new user name: ')
 
-    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to confirm user name update: ')
+    confirmed = input_handler.enter_master_key('Enter master key to confirm user name update: ')
 
     if confirmed:
         config.data[site_name]['user_name'] = user_name
@@ -146,7 +174,7 @@ def update_password(site_name):
         print(f'Password update cancelled for {site_name}.')
         return
 
-    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to confirm password update: ')
+    confirmed = input_handler.enter_master_key('Enter master key to confirm password update: ')
 
     if confirmed:
         config.data[site_name]['password'] = password
@@ -155,22 +183,8 @@ def update_password(site_name):
     else:
         print(f'Password update for {site_name} cancelled.')
 
-def get_password():
-    site_name = config.arguments
-
-    # site name must be passed for command
-    if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
-        return
-
-    # check if entry exist
-    if site_name not in config.data:
-        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
-        if choice == True:
-            new_password()
-        return
-
-    confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to retrieve password for {site_name}: ')
+def get_password(site_name):
+    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve password for {site_name}: ')
 
     if confirmed:
         password = config.data[site_name]['password']
@@ -179,22 +193,8 @@ def get_password():
     else:
         print(f'Password retrival for {site_name} cancelled.')
 
-def get_user_name():
-    site_name = config.arguments
-
-    # site name must be passed for command
-    if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
-        return
-
-    # check if entry exist
-    if site_name not in config.data:
-        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
-        if choice == True:
-            new_password()
-        return
-
-    confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to retrieve user name for {site_name}: ')
+def get_user_name(site_name):
+    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve user name for {site_name}: ')
 
     if confirmed:
         user_name = config.data[site_name]['user_name']
