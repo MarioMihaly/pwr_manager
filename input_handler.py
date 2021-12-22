@@ -43,7 +43,7 @@ def enter_master_key3():
             master_key = input(PROMPT + 'Enter master key: ')
             attempt_count += 1
 
-    if attempt_count > attempt_max:
+    if attempt_count >= attempt_max:
         return False
 
     return True
