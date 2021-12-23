@@ -1,10 +1,9 @@
 Commands available:
-    exit
-    new <site name>
-    update <site name>
-    update_key
-    reset
-    remove <site name>
-    get_user <site name>
-    get_password <site name>
+    new <site_name>
+    get <site_name> user|password
+    update <site_name> user|password
+    remove <site_name>
     list
+    update master
+    reset
+    exit

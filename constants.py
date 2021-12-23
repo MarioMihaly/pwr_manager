@@ -7,14 +7,14 @@ EXIT = 'exit'
 NEW = 'new'
 UPDATE = 'update'
 GET = 'get'
-GET_PASSWORD = 'get_password'
-GET_USER_NAME = 'get_user'
-UPDATE_KEY = 'update_key'
 RESET = 'reset'
 REMOVE = 'remove'
 HELP = 'help'
 LIST = 'list'
 
+##################
+#     Options
+##################
 MASTER = 'master'
 PASS = 'password'
 USER = 'user'
@@ -23,12 +23,6 @@ USER = 'user'
  #    Flags
 ##################
 CANCEL = 'cancel'
-
-#COMMAND_SELECTION = {
-#    EXIT: lambda: exit,
-#    NEW: lambda: new_password
-#    #UPDATE: lambda 
-#}
 
 ##################
 #   Data paths

@@ -1,16 +1,6 @@
 # TODO
 # option to type cancel at any point to interrupt
 #   or handle interrupts to return to default state while handling command
-# split on update using secondary key
-#   new commands for update:
-#   -> update <site name> password
-#   -> update <site name> user
-#   -> udate master
-#   new commands for get
-#   -> get <site name> passowrd
-#   -> get <site name> user
-
-
 
 import json
 from constants import *
@@ -100,6 +90,25 @@ def get():
     else:
         print(INVALID_COMMAND_MSG)
 
+def get_password(site_name):
+    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve password for {site_name}: ')
+
+    if confirmed:
+        password = config.data[site_name]['password']
+        print(f'Password for {site_name} is: {password}')
+
+    else:
+        print(f'Password retrival for {site_name} cancelled.')
+
+def get_user_name(site_name):
+    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve user name for {site_name}: ')
+
+    if confirmed:
+        user_name = config.data[site_name]['user_name']
+        print(f'User name for {site_name} is: {user_name}')
+
+    else:
+        print(f'User name retrival for {site_name} cancelled.')
 
 def update():
     # TODO
@@ -182,26 +191,6 @@ def update_password(site_name):
 
     else:
         print(f'Password update for {site_name} cancelled.')
-
-def get_password(site_name):
-    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve password for {site_name}: ')
-
-    if confirmed:
-        password = config.data[site_name]['password']
-        print(f'Password for {site_name} is: {password}')
-
-    else:
-        print(f'Password retrival for {site_name} cancelled.')
-
-def get_user_name(site_name):
-    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve user name for {site_name}: ')
-
-    if confirmed:
-        user_name = config.data[site_name]['user_name']
-        print(f'User name for {site_name} is: {user_name}')
-
-    else:
-        print(f'User name retrival for {site_name} cancelled.')
 
 def reset():
     choice = input_handler.yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
