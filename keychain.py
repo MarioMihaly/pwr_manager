@@ -1,42 +1,16 @@
 '''
     TODO
-    -> set up of master password
     -> reading entries (read into Pandas.DataFrame)
     -> look up function
         -> list all entries, way for user to select
         -> up and down arrows and enter for selection ?
-    -> update_email for entrys
     -> allow duplicates
-    -> add better command handler
-        -> dict -> map to functions
-        -> introduce global variables for command and arguments
 '''
 
-from commands import *
-from constants import *
 import config
+from constants import PROMPT
 from input_handler import split_first
-
-COMMANDS = {
-    EXIT: lambda: exit(),
-    NEW: lambda: new_password(),
-    UPDATE: lambda: update(),
-    GET: lambda: get(),
-    RESET: lambda: reset(),
-    REMOVE: lambda: remove(),
-    HELP: lambda: help(),
-    LIST: lambda: list_entries()
-}
-
-def command_handler(command):
-    '''
-        Function to handle calls to available commands.
-    '''
-    if config.arguments != None:
-        config.arguments = config.arguments.strip()
-
-    COMMANDS.get(command, lambda: print('Invalid command.'))()
-    
+from command_handler import command_handler
     
 def main():
     try:

@@ -27,6 +27,6 @@ CANCEL = 'cancel'
 ##################
 #   Data paths
 ##################
-keys_path = './data/keys.json'
-data_path = './data/data.json'
+data_bin = './data/data.bin'
+key_bin = './data/key.bin'
 help_path = './data/help.txt'

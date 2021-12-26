@@ -6,17 +6,13 @@
 
 '''
 
-import config
-
 from Cryptodome import Random
 from Cryptodome.Cipher import AES
-from Cryptodome.Random import get_random_bytes
 from Cryptodome.Hash import SHA256
 
-
 class AES_encryption:
-    def __init__(self, password):
-        self.key = str_to_SHA(password)
+    def __init__(self, key):
+        self.key = key
 
     def pad(self, message):
         return message.encode() + b"\0" * (AES.block_size - len(message) % AES.block_size)

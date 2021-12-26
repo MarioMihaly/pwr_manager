@@ -1,4 +1,4 @@
-data/data.json
-data/keys.json
+data/data.bin
+data/key.bin
 __pycache__/
 testing.py

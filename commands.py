@@ -3,13 +3,13 @@
 #   or handle interrupts to return to default state while handling command
 
 import json
+import encryption
 from constants import *
 import input_handler
 import config
 import sys
 
 INVALID_COMMAND_MSG = f'Invalid command. Type "{HELP}" to see command usage.'
-
 
 def exit():
     '''
@@ -18,14 +18,14 @@ def exit():
         -> exit CLI
     '''
     # Save data
-    with open(data_path, 'w') as data_file:
-        json.dump(config.data, data_file)
+    with open(data_bin, 'wb') as data_file:
+        encoder = encryption.AES_encryption(config.key_hash)
+        encrypted_data = encoder.encrypt(json.dumps(config.data))
+        data_file.write(encrypted_data)
 
     # Save keys
-    with open(keys_path, 'w') as keys_file:
-        config.keys['keys']['public'] = config.public_key
-        config.keys['keys']['private'] = config.private_key_enc
-        json.dump(config.keys, keys_file)
+    with open(key_bin, 'wb') as key_f:
+            key_f.write(config.key_hash)
 
     # Exit application
     sys.exit()
@@ -44,14 +44,14 @@ def new_password():
         if replace == False:
              return
 
-    user_name = input(PROMPT + 'Enter user name: ')
+    user_name = input('Enter user name: ')
     password = input_handler.same_password()
 
     if password == CANCEL:
         print(f'New entry cancelled for {site_name}.')
         return
 
-    confirmed = input_handler.enter_master_key(PROMPT + 'Enter master key to add new entry: ')
+    confirmed = input_handler.enter_master_key('Enter master key to add new entry: ')
 
     if confirmed:
         config.data[site_name] = {
@@ -153,14 +153,14 @@ def update_master_key():
         new_master_key = input_handler.same_password('Enter new master key: ', 'Confirm new master key: ')
 
         if new_master_key != CANCEL:
-            config.private_key_enc = new_master_key
+            config.key_hash = encryption.str_to_SHA(new_master_key)
             print('New master key saved.')
             return
     
     print('Update to the master key cancelled.')
 
 def update_user_name(site_name):
-    user_name = input(PROMPT + 'Enter new user name: ')
+    user_name = input('Enter new user name: ')
 
     confirmed = input_handler.enter_master_key('Enter master key to confirm user name update: ')
 
@@ -218,7 +218,7 @@ def remove():
             new_password()
         return
 
-    confirmed = input_handler.enter_master_key(PROMPT + f'Enter master key to remove entry for {site_name}: ')
+    confirmed = input_handler.enter_master_key(f'Enter master key to remove entry for {site_name}: ')
 
     if confirmed:
         config.data.pop(site_name)
