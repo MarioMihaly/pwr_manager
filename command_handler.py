@@ -20,4 +20,8 @@ def command_handler(command):
     if config.arguments != None:
         config.arguments = config.arguments.strip()
 
-    COMMANDS.get(command, lambda: print('Invalid command.'))()
+    try:
+        COMMANDS.get(command, lambda: print('Invalid command.'))()
+    except KeyboardInterrupt:
+        print('\nCommand cancelled.')
+        pass
