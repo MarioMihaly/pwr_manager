@@ -303,5 +303,33 @@ class Database:
         self.connection.commit()
         cursor.close()
 
+    def reset_table(self, table):
+        '''
+            Method to reset the content of a table.
+
+            Arguments:
+                table: name of the table.
+        '''
+
+        if not self.exists(table, TABLES):
+            print(f'Table {table} does not exists.')
+            return
+
+        cursor = self.connection.cursor()
+        cursor.execute(f'TRUNCATE TABLE {table}')
+        cursor.close()
+
+    def change_password(self, new_password):
+        '''
+            Method to change user password for the database.
+
+            Arguments:
+                new_password: new password for the database.
+        '''
+        cursor = self.connection.cursor()
+        sql = f'ALTER USER {self.user}@{self.host} IDENTIFIED BY "{new_password}"'
+        cursor.execute(sql)
+        cursor.close()
+
     def exit(self):
         self.connection.close()
