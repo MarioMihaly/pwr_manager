@@ -8,13 +8,19 @@
 '''
 
 import config
-from constants import PROMPT
+from constants import PROMPT, HELP
 from input_handler import split_first
 from command_handler import command_handler
     
 def main():
     try:
-        config.init_data()
+        #config.init_data()
+        
+        if not config.init_keychain():
+            print('Login failed!')
+            exit()
+           
+        print(f'Welcome to your password manager. Enter "{HELP}" to display available commands.') 
 
         while True:
             command, config.arguments = split_first(input(PROMPT))
@@ -22,7 +28,7 @@ def main():
             command_handler(command)
 
     except KeyboardInterrupt:
-        print('Program interrupted, saving data and exiting.')
+        print('\nProgram interrupted, saving data and exiting.')
         exit()
 
 if __name__ == '__main__':

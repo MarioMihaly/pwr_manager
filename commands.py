@@ -4,12 +4,12 @@
 
 import json
 import encryption
-from constants import *
+import constants
 import input_handler
 import config
 import sys
 
-INVALID_COMMAND_MSG = f'Invalid command. Type "{HELP}" to see command usage.'
+INVALID_COMMAND_MSG = f'Invalid command. Type "{constants.HELP}" to see command usage.'
 
 def exit():
     '''
@@ -17,15 +17,9 @@ def exit():
         -> save changes made to files
         -> exit CLI
     '''
-    # Save data
-    with open(data_bin, 'wb') as data_file:
-        encoder = encryption.AES_encryption(config.key_hash)
-        encrypted_data = encoder.encrypt(json.dumps(config.data))
-        data_file.write(encrypted_data)
 
-    # Save keys
-    with open(key_bin, 'wb') as key_f:
-            key_f.write(config.key_hash)
+    # Exit database
+    config.database.exit()
 
     # Exit application
     sys.exit()
@@ -33,35 +27,26 @@ def exit():
 def new_password():
     site_name = config.arguments
 
-    # site name must be passed for command
     if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        print(INVALID_COMMAND_MSG)
         return
 
-    # check if there is entry for site_name
-    if site_name in config.data:
+    entry_in_db = config.database.in_table(constants.TABLE, constants.SITE_COL, site_name)
+    if entry_in_db:
         replace = input_handler.yes_or_no(f'{site_name} already in keychain. Do you want to replace it? [Y, N] ')
         if replace == False:
              return
+        config.database.delete(constants.TABLE, site_name)
 
     user_name = input('Enter user name: ')
     password = input_handler.same_password()
 
-    if password == CANCEL:
+    if password == constants.CANCEL:
         print(f'New entry cancelled for {site_name}.')
         return
 
-    confirmed = input_handler.enter_master_key('Enter master key to add new entry: ')
-
-    if confirmed:
-        config.data[site_name] = {
-                'user_name' : user_name,
-                'password' : password
-            }
-        print(f'New entry added for {site_name}.')
-
-    else:
-        print(f'New entry cancelled for {site_name}.')
+    config.database.insert(constants.TABLE, (site_name, user_name, password))
+    print(f'New entry added for {site_name}')
 
 def get():
     if config.arguments in {None, ''}:
@@ -74,41 +59,31 @@ def get():
         print(INVALID_COMMAND_MSG)
         return
     
-    if site_name not in config.data and argument in {USER, PASS}:
+    site_in_db = config.database.in_table(constants.TABLE, 'site', site_name)
+
+    if not site_in_db and argument in {constants.USER_NAME, constants.PASSWORD}:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
             config.arguments = site_name
             new_password()
         return
 
-    if argument == USER:
+    if argument == constants.USER_NAME:
         get_user_name(site_name)
 
-    elif argument == PASS:
+    elif argument == constants.PASSWORD:
         get_password(site_name)
     
     else:
         print(INVALID_COMMAND_MSG)
 
 def get_password(site_name):
-    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve password for {site_name}: ')
-
-    if confirmed:
-        password = config.data[site_name]['password']
-        print(f'Password for {site_name} is: {password}')
-
-    else:
-        print(f'Password retrival for {site_name} cancelled.')
+    password = config.database.get_entry(constants.TABLE, 'site', site_name, 'password')
+    print(f'Password for {site_name} is: {password}')
 
 def get_user_name(site_name):
-    confirmed = input_handler.enter_master_key(f'Enter master key to retrieve user name for {site_name}: ')
-
-    if confirmed:
-        user_name = config.data[site_name]['user_name']
-        print(f'User name for {site_name} is: {user_name}')
-
-    else:
-        print(f'User name retrival for {site_name} cancelled.')
+    user_name = config.database.get_entry(constants.TABLE, 'site', site_name, 'user')
+    print(f'User name for {site_name} is: {user_name}')
 
 def update():
     # TODO
@@ -121,55 +96,63 @@ def update():
         print(INVALID_COMMAND_MSG)
         return
 
-    option, argument = input_handler.split_first(config.arguments)
+    site_name, argument = input_handler.split_first(config.arguments)
 
-    if option in {None, ''}:
+    if site_name in {None, ''}:
         print(INVALID_COMMAND_MSG)
         return
 
-    if option == MASTER:
+    if site_name == constants.MASTER:
         update_master_key()
         return
     
-    elif option not in config.data and argument in {USER, PASS}:
-        choice = input_handler.yes_or_no(f'{option} not in keychain. Do you want to add it? [Y, N] ')
+    site_in_db = config.database.in_table(constants.TABLE, 'site', site_name)
+
+    if not site_in_db and argument in {constants.USER_NAME, constants.PASSWORD}:
+        choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
-            config.arguments = option
+            config.arguments = site_name
             new_password()
         return
 
-    if argument == USER:
-        update_user_name(option)
+    if argument == constants.USER_NAME:
+        update_user_name(site_name)
 
-    elif argument == PASS:
-        update_password(option)
+    elif argument == constants.PASSWORD:
+        update_password(site_name)
     
     else:
         print(INVALID_COMMAND_MSG)
 
 def update_master_key():
-    confirmed = input_handler.enter_master_key('Enter current master key to allow update to the master key: ')
-    if confirmed:
-        new_master_key = input_handler.same_password('Enter new master key: ', 'Confirm new master key: ')
+    '''
+        TODO:
+            set up interface to update password to database
+            when updated, encrypt passwords with the new key
+    '''
+    new_master_key = input_handler.same_password('Enter new master key: ', 'Confirm new master key: ')
+    
+    if new_master_key != constants.CANCEL:
+        config.database.change_password(new_master_key)
+        new_key_hash = encryption.str_to_SHA(new_master_key)
 
-        if new_master_key != CANCEL:
-            config.key_hash = encryption.str_to_SHA(new_master_key)
-            print('New master key saved.')
-            return
+        sites = config.database.get_entries(constants.TABLE, (constants.SITE_COL,))
+        for (site,) in sites:
+            # decrypt password using old key
+
+            # encrypt entries using new key
+            pass
+        
+        config.key_hash = new_key_hash
+        print('New master key saved.')
+        return
     
     print('Update to the master key cancelled.')
-
+    
 def update_user_name(site_name):
     user_name = input('Enter new user name: ')
-
-    confirmed = input_handler.enter_master_key('Enter master key to confirm user name update: ')
-
-    if confirmed:
-        config.data[site_name]['user_name'] = user_name
-        print(f'User name updated for {site_name}.')
-
-    else:
-        print(f'User name update for {site_name} cancelled.')
+    config.database.update(constants.TABLE, site_name, constants.USER_COL, user_name)
+    print(f'User name updated for {site_name}.')
 
 def update_password(site_name):
     # TODO
@@ -179,23 +162,17 @@ def update_password(site_name):
 
     password = input_handler.same_password('Enter new password: ', 'Confirm new password: ')
 
-    if password == CANCEL:
+    if password == constants.CANCEL:
         print(f'Password update cancelled for {site_name}.')
         return
 
-    confirmed = input_handler.enter_master_key('Enter master key to confirm password update: ')
-
-    if confirmed:
-        config.data[site_name]['password'] = password
-        print(f'Password updated for {site_name}.')
-
-    else:
-        print(f'Password update for {site_name} cancelled.')
+    config.database.update(constants.TABLE, site_name, constants.PASSWORD_COL, password)
+    print(f'Password updated for {site_name}.')
 
 def reset():
     choice = input_handler.yes_or_no('Are you sure you want to reset keychain? [Y, N] ')
     if choice == True:
-        config.data = {}
+        config.database.reset_table(constants.TABLE)
         print('Keychain reset.')
     else:
         print('Keychain reset cancelled.')
@@ -206,39 +183,32 @@ def remove():
 
     site_name = config.arguments
 
-    # site name must be passed for command
     if site_name in {None, ''}:
-        print(f'Invalid command. Type "{HELP}" to see command usage.')
+        print(f'Invalid command. Type "{constants.HELP}" to see command usage.')
         return
 
-    # check if entry exist
-    if site_name not in config.data:
+    site_in_db = config.database.in_table(constants.TABLE, constants.SITE_COL, site_name)
+    if not site_in_db:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
         if choice == True:
             new_password()
         return
 
-    confirmed = input_handler.enter_master_key(f'Enter master key to remove entry for {site_name}: ')
-
-    if confirmed:
-        config.data.pop(site_name)
-        print(f'Entry for {site_name} removed.')
-
-    else:
-        print(f'Removal of entry for {site_name} cancelled.')
+    config.database.delete(constants.TABLE, site_name)
+    print(f'Entry for {site_name} removed.')
 
 def help():
-    with open(help_path, 'r') as f:
+    with open(constants.help_path, 'r') as f:
         help_msg = f.read()
         print(help_msg)
 
 def list_entries():
-    entry_keys = config.data.keys()
+    entries = config.database.get_entries(constants.TABLE, (constants.SITE_COL,))
 
-    if len(entry_keys) == 0:
+    if len(entries) == 0:
         print('No entries in password manager.')
         return
     
-    for k in entry_keys:
-        print(k)
+    for entry in entries:
+        print(entry[0])
     
