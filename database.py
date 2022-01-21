@@ -240,9 +240,10 @@ class Database:
             return
         
         try:
-            values_str = ', '.join([f"'{v}'" for v in values])
+            values_str = ', '.join(['%s'] * len(values))
             cursor = self.connection.cursor()
-            cursor.execute(f'INSERT INTO {table} VALUES ({values_str})')
+            sql = f'INSERT INTO {table} VALUES ({values_str})'
+            cursor.execute(sql, values)
             self.connection.commit()
             cursor.close()
         

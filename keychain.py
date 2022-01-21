@@ -1,6 +1,5 @@
 '''
     TODO
-    -> reading entries (read into Pandas.DataFrame)
     -> look up function
         -> list all entries, way for user to select
         -> up and down arrows and enter for selection ?
@@ -14,8 +13,6 @@ from command_handler import command_handler
     
 def main():
     try:
-        #config.init_data()
-        
         if not config.init_keychain():
             print('Login failed!')
             exit()

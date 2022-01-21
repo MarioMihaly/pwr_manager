@@ -2,7 +2,6 @@
 # option to type cancel at any point to interrupt
 #   or handle interrupts to return to default state while handling command
 
-import json
 import encryption
 import constants
 import input_handler
@@ -34,8 +33,10 @@ def new_password():
     entry_in_db = config.database.in_table(constants.TABLE, constants.SITE_COL, site_name)
     if entry_in_db:
         replace = input_handler.yes_or_no(f'{site_name} already in keychain. Do you want to replace it? [Y, N] ')
+        
         if replace == False:
              return
+        
         config.database.delete(constants.TABLE, site_name)
 
     user_name = input('Enter user name: ')
@@ -45,7 +46,9 @@ def new_password():
         print(f'New entry cancelled for {site_name}.')
         return
 
-    config.database.insert(constants.TABLE, (site_name, user_name, password))
+    enrypted_password = config.encryptor.encrypt(password)
+    config.database.insert(constants.TABLE, (site_name, user_name, enrypted_password))
+    
     print(f'New entry added for {site_name}')
 
 def get():
@@ -78,7 +81,8 @@ def get():
         print(INVALID_COMMAND_MSG)
 
 def get_password(site_name):
-    password = config.database.get_entry(constants.TABLE, 'site', site_name, 'password')
+    enrypted_password = config.database.get_entry(constants.TABLE, 'site', site_name, 'password')
+    password = config.encryptor.decrypt(bytes(enrypted_password))
     print(f'Password for {site_name} is: {password}')
 
 def get_user_name(site_name):
@@ -90,7 +94,6 @@ def update():
     # check new password is not the same as old one -> define function for it
     # if multiple entries, prompt for email or
     # list all of them and select with up and down keys ?
-
 
     if config.arguments in {None, ''}:
         print(INVALID_COMMAND_MSG)
@@ -110,9 +113,11 @@ def update():
 
     if not site_in_db and argument in {constants.USER_NAME, constants.PASSWORD}:
         choice = input_handler.yes_or_no(f'{site_name} not in keychain. Do you want to add it? [Y, N] ')
+        
         if choice == True:
             config.arguments = site_name
             new_password()
+        
         return
 
     if argument == constants.USER_NAME:
@@ -135,15 +140,23 @@ def update_master_key():
     if new_master_key != constants.CANCEL:
         config.database.change_password(new_master_key)
         new_key_hash = encryption.str_to_SHA(new_master_key)
+        new_enryptor = encryption.AES_encryption(new_key_hash)
 
         sites = config.database.get_entries(constants.TABLE, (constants.SITE_COL,))
+        
         for (site,) in sites:
             # decrypt password using old key
+            old_encryption = config.database.get_entry(constants.TABLE, constants.SITE_COL, site, constants.PASSWORD_COL)
+            password = config.encryptor.decrypt(old_encryption)
 
             # encrypt entries using new key
-            pass
+            new_enrcyption = new_enryptor.encrypt(password)
+            config.database.update(constants.TABLE, site, constants.PASSWORD_COL, new_enrcyption)
+            
         
         config.key_hash = new_key_hash
+        config.encryptor = new_enryptor
+
         print('New master key saved.')
         return
     

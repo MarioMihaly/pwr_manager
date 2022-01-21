@@ -27,8 +27,6 @@ CANCEL = 'cancel'
 ##################
 #   Data paths
 ##################
-data_bin = './data/data.bin'
-key_bin = './data/key.bin'
 help_path = './data/help.txt'
 
 ##################
@@ -38,7 +36,7 @@ HOST = 'localhost'
 USER = 'password_manager'
 DATABASE = 'passwords'
 TABLE = 'passwords'
-COLUMNS = (('site', 'VARCHAR(20)'), ('user', 'VARCHAR(20)'), ('password', 'VARCHAR(32)'))
+COLUMNS = (('site', 'VARCHAR(20)'), ('user', 'VARCHAR(20)'), ('password', 'BINARY(32)'))
 SITE_COL = 'site'
 USER_COL = 'user'
 PASSWORD_COL = 'password'
