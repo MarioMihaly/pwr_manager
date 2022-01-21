@@ -46,8 +46,9 @@ def new_password():
         print(f'New entry cancelled for {site_name}.')
         return
 
+    enrypted_user_name = config.encryptor.encrypt(user_name)
     enrypted_password = config.encryptor.encrypt(password)
-    config.database.insert(constants.TABLE, (site_name, user_name, enrypted_password))
+    config.database.insert(constants.TABLE, (site_name, enrypted_user_name, enrypted_password))
     
     print(f'New entry added for {site_name}')
 
@@ -86,7 +87,8 @@ def get_password(site_name):
     print(f'Password for {site_name} is: {password}')
 
 def get_user_name(site_name):
-    user_name = config.database.get_entry(constants.TABLE, 'site', site_name, 'user')
+    encrypted_user_name = config.database.get_entry(constants.TABLE, 'site', site_name, 'user')
+    user_name = config.encryptor.decrypt(bytes(encrypted_user_name))
     print(f'User name for {site_name} is: {user_name}')
 
 def update():
@@ -145,6 +147,16 @@ def update_master_key():
         sites = config.database.get_entries(constants.TABLE, (constants.SITE_COL,))
         
         for (site,) in sites:
+            # TODO:
+            # new function in database to change enryption of entry
+            
+            # decrypt user name using old key
+            old_encryption = config.database.get_entry(constants.TABLE, constants.SITE_COL, site, constants.USER_COL)
+            user_name = config.encryptor.decrypt(old_encryption)
+
+            new_enrcyption = new_enryptor.encrypt(user_name)
+            config.database.update(constants.TABLE, site, constants.USER_COL, new_enrcyption)
+
             # decrypt password using old key
             old_encryption = config.database.get_entry(constants.TABLE, constants.SITE_COL, site, constants.PASSWORD_COL)
             password = config.encryptor.decrypt(old_encryption)
@@ -164,7 +176,8 @@ def update_master_key():
     
 def update_user_name(site_name):
     user_name = input('Enter new user name: ')
-    config.database.update(constants.TABLE, site_name, constants.USER_COL, user_name)
+    enrypted_user_name = config.encryptor.encrypt(user_name)
+    config.database.update(constants.TABLE, site_name, constants.USER_COL, enrypted_user_name)
     print(f'User name updated for {site_name}.')
 
 def update_password(site_name):
@@ -179,7 +192,8 @@ def update_password(site_name):
         print(f'Password update cancelled for {site_name}.')
         return
 
-    config.database.update(constants.TABLE, site_name, constants.PASSWORD_COL, password)
+    enrypted_password = config.encryptor.encrypt(password)
+    config.database.update(constants.TABLE, site_name, constants.PASSWORD_COL, enrypted_password)
     print(f'Password updated for {site_name}.')
 
 def reset():
