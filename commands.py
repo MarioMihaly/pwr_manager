@@ -1,7 +1,3 @@
-# TODO
-# option to type cancel at any point to interrupt
-#   or handle interrupts to return to default state while handling command
-
 import encryption
 import constants
 import input_handler
@@ -84,12 +80,12 @@ def get():
 def get_password(site_name):
     enrypted_password = config.database.get_entry(constants.TABLE, 'site', site_name, 'password')
     password = config.encryptor.decrypt(bytes(enrypted_password))
-    print(f'Password for {site_name} is: {password}')
+    input_handler.copy_to_clipboard(password, f'Password for {site_name} copied to clipboard.')
 
 def get_user_name(site_name):
     encrypted_user_name = config.database.get_entry(constants.TABLE, 'site', site_name, 'user')
     user_name = config.encryptor.decrypt(bytes(encrypted_user_name))
-    print(f'User name for {site_name} is: {user_name}')
+    input_handler.copy_to_clipboard(user_name, f'User name for {site_name} copied to clipboard.')
 
 def update():
     # TODO
