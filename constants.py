@@ -27,13 +27,13 @@ CANCEL = 'cancel'
 ##################
 #   Data paths
 ##################
-help_path = './data/help.txt'
+HELP_PATH = './data/help.txt'
 
 ##################
 #    Database
 ##################
 HOST = 'localhost'
-USER = 'password_manager'
+DATABASE_USER = 'password_manager'
 DATABASE = 'passwords'
 TABLE = 'passwords'
 COLUMNS = (('site', 'VARCHAR(20)'), ('user', 'BINARY(32)'), ('password', 'BINARY(32)'))

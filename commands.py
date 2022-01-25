@@ -225,7 +225,7 @@ def remove():
     print(f'Entry for {site_name} removed.')
 
 def help():
-    with open(constants.help_path, 'r') as f:
+    with open(constants.HELP_PATH, 'r') as f:
         help_msg = f.read()
         print(help_msg)
 
